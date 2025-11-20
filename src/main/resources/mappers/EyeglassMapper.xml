@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mostarc.eyeglass.dao.EyeglassDao">
+
+    <resultMap id="EyeglassById" type="com.mostarc.eyeglass.pojo.dto.EyeglassById" autoMapping="true">
+        <id property="id" column="id"/>
+        <collection property="comment" ofType="com.mostarc.eyeglass.pojo.entity.Comment" autoMapping="true"/>
+    </resultMap>
+
+    <select id="search" resultType="com.mostarc.eyeglass.pojo.dto.EyeglassList">
+        SELECT id,imgUrl,price,brand,name,refractivity FROM eyeglassdetail
+        WHERE refractivity &gt;= #{refractivity[0]} and  refractivity &lt;= #{refractivity[1]}
+        <if test="brand != null">
+            AND brand = #{brand}
+        </if>
+        <if test="lowPrice != null">
+            AND price &gt;= #{lowPrice}
+        </if>
+        <if test="highPrice != null">
+            AND price &lt;= #{highPrice}
+        </if>
+    </select>
+
+
+    <select id="getEyeglassById" resultMap="EyeglassById">
+        select eyeglassdetail.id,imgUrl,price,brand,name,refractivity,content,comment.eyeglass_id as eyeglassId
+        from eyeglassdetail
+        left join comment on eyeglassdetail.id = comment.eyeglass_id
+        where eyeglassdetail.id = #{id}
+    </select>
+
+    <insert id="submitassess" parameterType="com.mostarc.eyeglass.pojo.entity.Comment">
+        insert into comment(content,eyeglass_id) values(#{content},#{eyeglassId})
+    </insert>
+</mapper>
